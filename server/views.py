@@ -42,4 +42,12 @@ class Agent_add(web.RequestHandler):
         pass
 
     def get(self, *args, **kwargs):
+
         self.render('agent_add.html')
+class ProxyIp(web.RequestHandler):
+
+    def initialize(self):
+        pass
+
+    def get(self, *args, **kwargs):
+        self.render('pages.html')
