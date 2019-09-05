@@ -7,6 +7,8 @@ urls = [
     ('/login/?',views.LoginHandler),
     ('/agent_add/?',views.Agent_add),
     ('/proxyip/?',views.ProxyIp),
+    ('/interfaceip/?',views.InterfaceIp),
+    ('/get_ip/?',views.GetIp),
 ]
 
 

@@ -123,3 +123,8 @@ function getTips(_this, str){
 	  	time: 0
 	});
 }
+
+
+
+
+
