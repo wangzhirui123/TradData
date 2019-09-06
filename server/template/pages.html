@@ -57,19 +57,9 @@
 								</tr>
 							</thead>
 							<tbody>
-							{% for i in ip_list %}
-								<tr>
-									<td>{{i.IP}}</td>
-									<td>{{i.proxy}}</td>
-									<td>{{i.CheckDateTime}}</td>
-									<td>{{i.HttpType}}</td>
-									<td></td>
-
-							{% end %}
-
-								</tr>
 							</tbody>
 						</table>
+						<lable hidden="hidden" id="total">{{total}}</lable>
 						<!-- layUI 分页模块 -->
 						<div id="pages1"></div>
 						<script>
@@ -78,12 +68,23 @@
 									layer = layui.layer;
 
 								//总页数大于页码总数
+								var total = document.getElementById('total').textContent;
+//								alert(total);
 								laypage.render({
 									elem: 'pages1',
-									count: 30,
+									count: total,
 									layout: ['prev', 'page', 'next', 'limit', 'skip'],
 									jump: function(obj) {
-										console.log(obj)
+										console.log(obj);
+										$.post('/getip/',{'number':obj.curr,'limit':obj.limit},function(result){
+											console.log(result);
+											$("tbody").empty();
+											var json_data = JSON.parse(result);
+											$.each(json_data,function(index,value){
+												var trHTML = "<tr>"+"<td>"+value.ip+"</td>"+"<td>"+value.proxy+"</td>"+"<td>"+value.CheckDateTime+"</td>"+"<td>"+value.HttpType+"</td>"+"<td></td>"+"</tr>";
+												$('tbody').append(trHTML)
+											})
+										});
 									}
 								});
 							});

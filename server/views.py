@@ -6,7 +6,12 @@ from settings import DOMAIN
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import create_engine
-from server.models import User
+from server.models import ProxyIpModel
+
+
+
+
+
 
 class MainHandler(web.RequestHandler):
 
@@ -64,10 +69,8 @@ class ProxyIp(web.RequestHandler):
 
 
     def get(self, *args, **kwargs):
-        ips = self.conn.query(User).order_by(User.P_id.desc()).all()[:10]
-        print(ips)
-
-        self.render('pages.html',ip_list = ips)
+        ips = self.conn.query(ProxyIpModel).order_by(ProxyIpModel.P_id.desc()).all()
+        self.render('pages.html',ip_list = ips,total = len(ips))
 
 class InterfaceIp(web.RequestHandler):
 
@@ -79,27 +82,36 @@ class InterfaceIp(web.RequestHandler):
         self.render('interfaceip.html',API = ApiCon)
     def post(self, *args, **kwargs):
         import json
-        pwd = self.get_body_argument('password')
         uname = self.get_body_argument('loginName')
         IpNumber = self.get_body_argument('IpNumber')
         http_type = self.get_body_argument('type')
-        url = DOMAIN+'/get_ip/?uname={}&http_type={}&IpNumber={}'.format(uname,http_type,IpNumber)
+        url = DOMAIN+'/getip/?uname={}&http_type={}&IpNumber={}'.format(uname,http_type,IpNumber)
         self.render('interfaceip.html',API=url)
 
 class GetIp(web.RequestHandler):
 
     def initialize(self):
-        pass
+        conn_url = 'mysql://root:123456@127.0.0.1:3306/mysql?charset=utf8'
+        engine = create_engine(conn_url,encoding='utf8',echo=True)
+        Base = declarative_base(bind=engine)
+        session = sessionmaker(bind=engine)
+        self.conn = session()
 
     def get(self, *args, **kwargs):
-        http_type = self.get_query_argument('http_type')
         IpNumber = self.get_query_argument('IpNumber')
+        HttpType = self.get_query_argument('http_type')
 
 
-        self.write('111')
+
 
     def post(self, *args, **kwargs):
-        pass
+        import json
+        curr_page = int(self.get_body_argument('number'))
+        size = int(self.get_body_argument('limit'))
+        data_list = [{'ip':i.IP,'proxy':i.proxy,'HttpType':i.HttpType,'CheckDateTime':str(i.CheckDateTime)} for i in self.conn.query(ProxyIpModel).offset((curr_page-1)*size).limit(size).all()]
+        json_data = json.dumps(data_list,ensure_ascii=False)
+        self.write(json_data)
+
 
 
 

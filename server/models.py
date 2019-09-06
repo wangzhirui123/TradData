@@ -10,7 +10,7 @@ conn_url = 'mysql://root:123456@127.0.0.1:3306/mysql?charset=utf8'
 engine = create_engine(conn_url,encoding='utf8',echo=True)
 Base = declarative_base(bind=engine)
 
-class User(Base):
+class ProxyIpModel(Base):
     __tablename__ = 't_proxy'
     P_id = Column(Integer,primary_key=True,autoincrement=True)
     IP = Column(String(length=20))
@@ -19,13 +19,13 @@ class User(Base):
     CheckDateTime = Column(DateTime)
 
 
-# Base.metadata.create_all()
+Base.metadata.create_all()
 
 def insert(ip):
     import datetime
     session = sessionmaker(bind=engine)
     conn = session()
-    ip = User(IP='192.168.1.{}'.format(ip),proxy='{}'.format(ip),HttpType='http',CheckDateTime=datetime.datetime.now())
+    ip = ProxyIpModel(IP='192.168.1.{}'.format(ip),proxy='{}'.format(ip),HttpType='http',CheckDateTime=datetime.datetime.now())
     conn.add(ip)
     conn.commit()
     conn.refresh(ip)
@@ -43,4 +43,5 @@ def queryAll(t_name):
 
 
 
-
+for i in range(2,255):
+    insert(i)
